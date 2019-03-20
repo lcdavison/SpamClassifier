@@ -1,24 +1,28 @@
 import csv
+import numpy as np
+from sklearn.neighbors import KNeighborsClassifier
 
 #TODO: Scrub the data, there's a lot of redundant values
-#TODO: Split the dataset into Training and Test sets
 
 #   Reads the contents of a dataset into the data array
-def read_dataset ( filename, training_set = [ ], test_set = [ ] ):
+def read_dataset ( filename ):
     with open ( filename, 'r' ) as f:
         reader = csv.reader ( f )
         data = list ( reader )
-        training_set.append ( data [ 0:3680 ] )
-        test_set.append ( data [ 3681:4600 ] )
-        # print ( data )
+        data = np.array ( data, dtype=float )
+        return data
 
 def main ( ):
-    training = [ ]  #   Contains Training Set
-    test = [ ]      #   Contains Test Set
+    dataset = read_dataset ( "..\dataset.csv" )
 
-    read_dataset ( "..\dataset.csv", training, test )
+    X = dataset [ :, : 57 ]
+    Y = dataset [ :, 57 ]
 
-    for row in training:
-        print ( row )
+    knn = KNeighborsClassifier ( n_neighbors = 3 )
+
+    from sklearn.model_selection import cross_val_score
+    cvs = cross_val_score ( knn, X, Y, cv = 5 )
+    print ( "# CV Accuracy Scores : ", cvs )
+    print ( "# CV Accuracy Mean : ", cvs.mean ( ) )
 
 main ( )
